@@ -1,33 +1,47 @@
 #include "main.h"
 /**
- *
- *
- *
- */
+* _printf - main function to print in console
+* @format: array to print and check type
+* Return: count of character printed
+**/
 int _printf(const char *format, ...)
 {
-	int i = 0;
-	va_list args;
-	int numb = 0;
-	va_start(args, format);
+	int count = -1;
 
-	while (format[i])
+	if (format != NULL)
 	{
-		while (format[i] == '%')
+		int i;
+		va_list ar_list;
+		int (*o)(va_list);
+
+		va_start(ar_list, format);
+
+		if (format[0] == '%' && format[1] == '\0')
+			return (-1);
+
+		count = 0;
+
+		for (i = 0; format[i] != '\0'; i++)
 		{
-			switch (format[i + 1])
+			if (format[i] == '%')
 			{
-				case 'c' :
-					numb += print_char(args);
-					i += 2;
-					break;
-
+				if (format[i + 1] == '%')
+				{
+					count += _putchar(format[i]);
+					i++;
+				}
+				else if (format[i + 1] != '\0')
+				{
+					o = get_func(format[i + 1]);
+					count += (o ? o(ar_list) : _putchar(format[i]) + _putchar(format[i + 1]));
+					i++;
+				}
 			}
+			else
+				count += _putchar(format[i]);
+		}
+		va_end(ar_list);
 	}
-		_putchar(format[i]);
-		numb++;
-		i++;
-}
-return (numb);
-}
 
+	return (count);
+}
