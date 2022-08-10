@@ -1,65 +1,46 @@
 #include "main.h"
 
 /**
- * _printf - prints anything to stdout
- * @format: the format string
- * Return: The number of characters printed
+ * _printf - produces output according to a format
+ * @format: format string containing the characters and specifiers
+ * Description: this function calls the get_print() function
+ * Return: length of the formatted output string
  */
 
 int _printf(const char *format, ...)
 {
-	int index = 0, printed = 0;
+	int (*pfunc)(va_list, flags_t *);
+	const char *p;
 	va_list args;
+	flags_t flags = {0, 0, 0};
+
+	register int count = 0;
 
 	va_start(args, format);
-
-	while (format[index])
+	if (!format || (format[0] == '%' && !format[1]))
+		return (-1);
+	if (format[0] == '%' && format[1] == ' ' && !format[2])
+		return (-1);
+	for (p = format; *p; p++)
 	{
-		if (format[index] == '%')
+		if (*p == '%')
 		{
-			switch (format[index + 1])
+			p++;
+			if (*p == '%')
 			{
-				case 's':
-					printed += print_string(args);
-					index += 2;
-					break;
+				count += _putchar('%');
+				continue;
 			}
-		}
-		if (format[index])
-		{
-			_putchar(format[index]);
-			printed++;
-		}
-		index++;
+			while (get_flag(*p, &flags))
+				p++;
+			pfunc = get_print(*p);
+			count += (pfunc)
+				? pfunc(args, &flags)
+				: _printf("%%%c", *p);
+		} else
+			count += _putchar(*p);
 	}
+	_putchar(-1);
 	va_end(args);
-	return (printed);
-}
-
-/**
- * _puts - prints string
- * @str: string to print
- * Return: number of characters printed
- */
-
-int _puts(char *str)
-{
-	int index = 0;
-
-	while (str[index])
-	{
-		_putchar (str[index]);
-		index++;
-	}
-	return (index);
-}
-
-/**
- * print_string - Prints a string
- * Return: printed string
- */
-
-int print_string(va_list args)
-{
-	return (_puts(va_arg(args, char *)));
+	return (count);
 }
