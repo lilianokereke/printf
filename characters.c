@@ -1,33 +1,28 @@
 #include "main.h"
 
 /**
- * print_c - Print characters (%c)
- * @ar_list: Store the a list of characters
- * Return: num of parameters printed
+ * convert - converts number and base into string
+ * @num: input number
+ * @base: input base
+ * @lowercase: flag if hexa values need to be lowercase
+ * Return: result string
  */
-int print_c(va_list ar_list)
+
+char *convert(unsigned long int num, int base, int lowercase)
 {
-	int c = va_arg(ar_list, int);
+	static char *rep;
+	static char buffer[50];
+	char *ptr;
 
-	return (_putchar(c));
-}
+	rep = (lowercase)
+		? "0123456789abcdef"
+		: "0123456789ABCDEF";
+	ptr = &buffer[49];
+	*ptr = '\0';
+	do {
+		*--ptr = rep[num % base];
+		num /= base;
+	} while (num != 0);
 
-/**
-* print_s - print string (%s)
-* @ar_list: Store the a list of characters
-* Return: num of parameters printed
-*/
-int print_s(va_list ar_list)
-{
-	int i, count = 0;
-	char *str;
-
-	str = va_arg(ar_list, char *);
-	if (str == NULL)
-		str = "(null)";
-
-	for (i = 0; str[i]; i++)
-		count += _putchar(str[i]);
-
-	return (count);
+	return (ptr);
 }
